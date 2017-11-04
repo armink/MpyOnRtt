@@ -30,6 +30,8 @@
 #ifndef EF_CFG_H_
 #define EF_CFG_H_
 
+#include <stm32f4xx.h>
+
 /* using ENV function */
 #define EF_USING_ENV
 /* using wear leveling mode for ENV */
@@ -44,7 +46,7 @@
 #define EF_USING_LOG
 
 /* the minimum size of flash erasure */
-#define EF_ERASE_MIN_SIZE         4096
+#define EF_ERASE_MIN_SIZE         (128 * 1024)              /* it is 128K for compatibility */
 
 /**
  *
@@ -76,34 +78,30 @@
  * @note the log area size must be more than twice of EF_ERASE_MIN_SIZE
  */
 /* backup area start address */
-#define EF_START_ADDR             (0) /* from the SPI Flash position: 0KB*/
+#define EF_START_ADDR             (FLASH_BASE + 256 * 1024) /* on the chip position: 256KB */
 /* the user setting size of ENV, must be word alignment */
 #define ENV_USER_SETTING_SIZE     (2 * 1024)
 #ifndef EF_ENV_USING_PFS_MODE
     #ifndef EF_ENV_USING_WL_MODE
         /* ENV area total bytes size in normal mode. */
-        #define ENV_AREA_SIZE          (1 * EF_ERASE_MIN_SIZE)      /* 4K */
+        #define ENV_AREA_SIZE          (1 * EF_ERASE_MIN_SIZE)      /* 128K */
     #else
         /* ENV area total bytes size in wear leveling mode. */
-        #define ENV_AREA_SIZE          (4 * EF_ERASE_MIN_SIZE)      /* 16K */
+        #define ENV_AREA_SIZE          (4 * EF_ERASE_MIN_SIZE)      /* 512K */
     #endif
 #else
     #ifndef EF_ENV_USING_WL_MODE
         /* ENV area total bytes size in power fail safeguard mode. */
-        #define ENV_AREA_SIZE          (2 * EF_ERASE_MIN_SIZE)      /* 8K */
+        #define ENV_AREA_SIZE          (2 * EF_ERASE_MIN_SIZE)      /* 256K */
     #else
         /* ENV area total bytes size in wear leveling and power fail safeguard mode. */
-        #define ENV_AREA_SIZE          (6 * EF_ERASE_MIN_SIZE)      /* 24K */
+        #define ENV_AREA_SIZE          (6 * EF_ERASE_MIN_SIZE)      /* 768K */
     #endif
 #endif
 /* saved log area size */
-#define LOG_AREA_SIZE             (254 * EF_ERASE_MIN_SIZE)      /* 1016K */
+#define LOG_AREA_SIZE             (2 * EF_ERASE_MIN_SIZE)      /* 256K */
 
 /* print debug information of flash */
-//#define PRINT_DEBUG
-
-/* define the default ENV */
-#define EF_ENV_WEB_USERNAME       "rtt"
-#define EF_ENV_WEB_PASSWORD       "123456"
+#define PRINT_DEBUG
 
 #endif /* EF_CFG_H_ */

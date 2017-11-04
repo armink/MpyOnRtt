@@ -18,36 +18,18 @@
 #include <stm32f4xx.h>
 
 // <o> Internal SRAM memory size[Kbytes] <8-128>
-//	<i>Default: 124
+//	<i>Default: 128
 #define STM32_SRAM_BEGIN        SRAM_BASE
 #define STM32_SRAM_SIZE         128
 #define STM32_SRAM_END          (SRAM_BASE + STM32_SRAM_SIZE * 1024)
 
 /* RT_USING_UART */
-#define RT_USING_UART1
+#define RT_USING_UART3
 
 /* RT_USING_SPI */
-#define RT_USING_SPI1
+//#define RT_USING_SPI1
 
 #define HARDWARE_VERSION       "1.0"
-
-/* Flash partition table */
-#define RT_PARTITION_DEFAULT_TABLE               \
-{                                                \
-    {                                            \
-        /* EasyFlash Backup Section */           \
-        .name       = "ef_bak",                  \
-        .offset     = 0,                         \
-        .size       = 2 * 1024 * 1024,           \
-        .flags = PARTITION_WRITEABLE,            \
-    }, {                                         \
-        /* Fatfs*/                               \
-        .name       = "fatfs",                   \
-        .offset     = 2 * 1024 * 1024,           \
-        .size       = 6 * 1024 * 1024,           \
-        .flags = PARTITION_WRITEABLE,            \
-    }                                            \
-}
 
 #define SYSTERM_RUN_LED_ON                    GPIO_SetBits  (GPIOB,GPIO_Pin_12)                     //LED1ÁÁ
 #define SYSTERM_RUN_LED_OFF                   GPIO_ResetBits(GPIOB,GPIO_Pin_12)                     //LED1Ãð

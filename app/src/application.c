@@ -13,11 +13,6 @@
 #include <shell.h>
 #include <finsh.h>
 #include <cm_backtrace.h>
-#include <dfs_elm.h>
-#include <dfs_fs.h>
-#include <spi_flash.h>
-#include <spi_flash_sfud.h>
-#include <partition.h>
 
 #define SOFTWARE_VERSION     "0.11.04"
 
@@ -28,7 +23,6 @@ rt_uint32_t Total_Mem, Used_Mem, Max_Used_Mem;
 ALIGN(RT_ALIGN_SIZE)
 static rt_uint8_t thread_SysMonitor_stack[512];
 struct rt_thread thread_SysMonitor;
-rt_spi_flash_device_t nor_flash;
 
 static void rtt_user_assert_hook(const char* ex, const char* func, rt_size_t line);
 static void elog_user_assert_hook(const char* ex, const char* func, size_t line);
@@ -132,7 +126,7 @@ static void rtt_user_assert_hook(const char* ex, const char* func, rt_size_t lin
     elog_output_lock_enabled(false);
     elog_flash_lock_enabled(false);
     elog_a("rtt", "(%s) has assert failed at %s:%ld.", ex, func, line);
-    cm_backtrace_assert(__get_SP());
+    cm_backtrace_assert(cmb_get_sp());
     elog_flash_flush();
     while(1);
 }
@@ -147,7 +141,7 @@ static void elog_user_assert_hook(const char* ex, const char* func, size_t line)
     elog_output_lock_enabled(false);
     elog_flash_lock_enabled(false);
     elog_a("elog", "(%s) has assert failed at %s:%ld.\n", ex, func, line);
-    cm_backtrace_assert(__get_SP());
+    cm_backtrace_assert(cmb_get_sp());
     elog_flash_flush();
     while(1);
 }
@@ -169,7 +163,7 @@ static rt_err_t exception_hook(void *context) {
     list_thread();
 #endif
 
-    cm_backtrace_fault(*((uint32_t *)(__get_SP() + sizeof(uint32_t) * 8)), __get_SP() + sizeof(uint32_t) * 9);
+    cm_backtrace_fault(*((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * 8)), cmb_get_sp() + sizeof(uint32_t) * 9);
     elog_flash_flush();
     while (_continue == 1);
 
