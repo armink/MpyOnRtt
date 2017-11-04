@@ -71,8 +71,7 @@
 #define RT_USING_RTC
 // <bool name="RT_USING_SPI" description="Using SPI Device Driver Framework" default="true" />
 #define RT_USING_SPI
-// <bool name="RT_USING_SPI_WIFI" description="Using SPI WiFi Model: RW009" default="true" />.
-#define RT_USING_SPI_WIFI
+
 
 /* SECTION: Console options */
 #define RT_USING_CONSOLE

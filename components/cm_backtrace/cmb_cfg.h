@@ -38,7 +38,7 @@
 /* OS platform type, must config when CMB_USING_OS_PLATFORM is enable */
 #define CMB_OS_PLATFORM_TYPE           CMB_OS_PLATFORM_RTT
 /* cpu platform type, must config by user */
-#define CMB_CPU_PLATFORM_TYPE          CMB_CPU_ARM_CORTEX_M3
+#define CMB_CPU_PLATFORM_TYPE          CMB_CPU_ARM_CORTEX_M4
 /* enable dump stack information */
 #define CMB_USING_DUMP_STACK_INFO
 /* language of print information */

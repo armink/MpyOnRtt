@@ -27,26 +27,48 @@
  */
 
 #include <easyflash.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <sfud.h>
 #include <rthw.h>
 #include <rtthread.h>
-#include <spi_flash.h>
+#include <stm32f4xx.h>
+
+/* base address of the flash sectors */
+#define ADDR_FLASH_SECTOR_0      ((uint32_t)0x08000000) /* Base address of Sector 0, 16 K bytes   */
+#define ADDR_FLASH_SECTOR_1      ((uint32_t)0x08004000) /* Base address of Sector 1, 16 K bytes   */
+#define ADDR_FLASH_SECTOR_2      ((uint32_t)0x08008000) /* Base address of Sector 2, 16 K bytes   */
+#define ADDR_FLASH_SECTOR_3      ((uint32_t)0x0800C000) /* Base address of Sector 3, 16 K bytes   */
+#define ADDR_FLASH_SECTOR_4      ((uint32_t)0x08010000) /* Base address of Sector 4, 64 K bytes   */
+#define ADDR_FLASH_SECTOR_5      ((uint32_t)0x08020000) /* Base address of Sector 5, 128 K bytes  */
+#define ADDR_FLASH_SECTOR_6      ((uint32_t)0x08040000) /* Base address of Sector 6, 128 K bytes  */
+#define ADDR_FLASH_SECTOR_7      ((uint32_t)0x08060000) /* Base address of Sector 7, 128 K bytes  */
+#define ADDR_FLASH_SECTOR_8      ((uint32_t)0x08080000) /* Base address of Sector 8, 128 K bytes  */
+#define ADDR_FLASH_SECTOR_9      ((uint32_t)0x080A0000) /* Base address of Sector 9, 128 K bytes  */
+#define ADDR_FLASH_SECTOR_10     ((uint32_t)0x080C0000) /* Base address of Sector 10, 128 K bytes */
+#define ADDR_FLASH_SECTOR_11     ((uint32_t)0x080E0000) /* Base address of Sector 11, 128 K bytes */
+#define ADDR_FLASH_SECTOR_12     ((uint32_t)0x08100000) /* Base address of Sector 12, 16 K bytes  */
+#define ADDR_FLASH_SECTOR_13     ((uint32_t)0x08104000) /* Base address of Sector 13, 16 K bytes  */
+#define ADDR_FLASH_SECTOR_14     ((uint32_t)0x08108000) /* Base address of Sector 14, 16 K bytes  */
+#define ADDR_FLASH_SECTOR_15     ((uint32_t)0x0810C000) /* Base address of Sector 15, 16 K bytes  */
+#define ADDR_FLASH_SECTOR_16     ((uint32_t)0x08110000) /* Base address of Sector 16, 64 K bytes  */
+#define ADDR_FLASH_SECTOR_17     ((uint32_t)0x08120000) /* Base address of Sector 17, 128 K bytes */
+#define ADDR_FLASH_SECTOR_18     ((uint32_t)0x08140000) /* Base address of Sector 18, 128 K bytes */
+#define ADDR_FLASH_SECTOR_19     ((uint32_t)0x08160000) /* Base address of Sector 19, 128 K bytes */
+#define ADDR_FLASH_SECTOR_20     ((uint32_t)0x08180000) /* Base address of Sector 20, 128 K bytes */
+#define ADDR_FLASH_SECTOR_21     ((uint32_t)0x081A0000) /* Base address of Sector 21, 128 K bytes */
+#define ADDR_FLASH_SECTOR_22     ((uint32_t)0x081C0000) /* Base address of Sector 22, 128 K bytes */
+#define ADDR_FLASH_SECTOR_23     ((uint32_t)0x081E0000) /* Base address of Sector 23, 128 K bytes */
 
 /* default ENV set for user */
 static const ef_env default_env_set[] = {
-        {"iap_need_copy_app", "0"},
-        {"iap_need_crc32_check", "0"},
-        {"iap_copy_app_size", "0"},
-        {"stop_in_bootloader", "0"},
+        {"iap_need_copy_app","0"},
+        {"iap_copy_app_size","0"},
+        {"stop_in_bootloader","0"},
 };
 
 static char log_buf[RT_CONSOLEBUF_SIZE];
 static struct rt_semaphore env_cache_lock;
 
-static const sfud_flash *flash;
+static uint32_t stm32_get_sector(uint32_t address);
+static uint32_t stm32_get_sector_size(uint32_t sector);
 
 /**
  * Flash port for hardware initialize.
@@ -63,9 +85,6 @@ EfErrCode ef_port_init(ef_env const **default_env, size_t *default_env_size) {
     *default_env_size = sizeof(default_env_set) / sizeof(default_env_set[0]);
 
     rt_sem_init(&env_cache_lock, "env lock", 1, RT_IPC_FLAG_PRIO);
-
-    extern rt_spi_flash_device_t nor_flash;
-    flash = (sfud_flash_t)(nor_flash->user_data);
 
     return result;
 }
@@ -85,7 +104,10 @@ EfErrCode ef_port_read(uint32_t addr, uint32_t *buf, size_t size) {
 
     EF_ASSERT(size % 4 == 0);
 
-    sfud_read(flash, addr, size, (uint8_t *)buf);
+    /*copy from flash to ram */
+    for (; size > 0; size -= 4, addr += 4, buf++) {
+        *buf = *(uint32_t *) addr;
+    }
 
     return result;
 }
@@ -102,16 +124,29 @@ EfErrCode ef_port_read(uint32_t addr, uint32_t *buf, size_t size) {
  */
 EfErrCode ef_port_erase(uint32_t addr, size_t size) {
     EfErrCode result = EF_NO_ERR;
-    sfud_err sfud_result = SFUD_SUCCESS;
+    FLASH_Status flash_status;
+    size_t erased_size = 0;
+    uint32_t cur_erase_sector;
 
-    /* make sure the start address is a multiple of FLASH_ERASE_MIN_SIZE */
+    /* make sure the start address is a multiple of EF_ERASE_MIN_SIZE */
     EF_ASSERT(addr % EF_ERASE_MIN_SIZE == 0);
 
-    sfud_result = sfud_erase(flash, addr, size);
-
-    if(sfud_result != SFUD_SUCCESS) {
-        result = EF_ERASE_ERR;
+    /* start erase */
+    FLASH_Unlock();
+    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR
+                    | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+    /* it will stop when erased size is greater than setting size */
+    while(erased_size < size) {
+        cur_erase_sector = stm32_get_sector(addr + erased_size);
+        flash_status = FLASH_EraseSector(cur_erase_sector, VoltageRange_3);
+        if (flash_status != FLASH_COMPLETE) {
+            result = EF_ERASE_ERR;
+            break;
+        }
+        erased_size += stm32_get_sector_size(cur_erase_sector);
     }
+    FLASH_Lock();
+
     return result;
 }
 /**
@@ -127,15 +162,25 @@ EfErrCode ef_port_erase(uint32_t addr, size_t size) {
  */
 EfErrCode ef_port_write(uint32_t addr, const uint32_t *buf, size_t size) {
     EfErrCode result = EF_NO_ERR;
-    sfud_err sfud_result = SFUD_SUCCESS;
+    size_t i;
+    uint32_t read_data;
 
     EF_ASSERT(size % 4 == 0);
 
-    sfud_result = sfud_write(flash, addr, size, (const uint8_t *)buf);
-
-    if(sfud_result != SFUD_SUCCESS) {
-        result = EF_WRITE_ERR;
+    FLASH_Unlock();
+    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR
+                    | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+    for (i = 0; i < size; i += 4, buf++, addr += 4) {
+        /* write data */
+        FLASH_ProgramWord(addr, *buf);
+        read_data = *(uint32_t *)addr;
+        /* check data */
+        if (read_data != *buf) {
+            result = EF_WRITE_ERR;
+            break;
+        }
     }
+    FLASH_Lock();
 
     return result;
 }
@@ -152,6 +197,110 @@ void ef_port_env_lock(void) {
  */
 void ef_port_env_unlock(void) {
     rt_sem_release(&env_cache_lock);
+}
+
+
+/**
+ * Get the sector of a given address
+ *
+ * @param address flash address
+ *
+ * @return The sector of a given address
+ */
+static uint32_t stm32_get_sector(uint32_t address) {
+    uint32_t sector = 0;
+
+    if ((address < ADDR_FLASH_SECTOR_1) && (address >= ADDR_FLASH_SECTOR_0)) {
+        sector = FLASH_Sector_0;
+    } else if ((address < ADDR_FLASH_SECTOR_2) && (address >= ADDR_FLASH_SECTOR_1)) {
+        sector = FLASH_Sector_1;
+    } else if ((address < ADDR_FLASH_SECTOR_3) && (address >= ADDR_FLASH_SECTOR_2)) {
+        sector = FLASH_Sector_2;
+    } else if ((address < ADDR_FLASH_SECTOR_4) && (address >= ADDR_FLASH_SECTOR_3)) {
+        sector = FLASH_Sector_3;
+    } else if ((address < ADDR_FLASH_SECTOR_5) && (address >= ADDR_FLASH_SECTOR_4)) {
+        sector = FLASH_Sector_4;
+    } else if ((address < ADDR_FLASH_SECTOR_6) && (address >= ADDR_FLASH_SECTOR_5)) {
+        sector = FLASH_Sector_5;
+    } else if ((address < ADDR_FLASH_SECTOR_7) && (address >= ADDR_FLASH_SECTOR_6)) {
+        sector = FLASH_Sector_6;
+    } else if ((address < ADDR_FLASH_SECTOR_8) && (address >= ADDR_FLASH_SECTOR_7)) {
+        sector = FLASH_Sector_7;
+    } else if ((address < ADDR_FLASH_SECTOR_9) && (address >= ADDR_FLASH_SECTOR_8)) {
+        sector = FLASH_Sector_8;
+    } else if ((address < ADDR_FLASH_SECTOR_10) && (address >= ADDR_FLASH_SECTOR_9)) {
+        sector = FLASH_Sector_9;
+    } else if ((address < ADDR_FLASH_SECTOR_11) && (address >= ADDR_FLASH_SECTOR_10)) {
+        sector = FLASH_Sector_10;
+    } else if ((address < ADDR_FLASH_SECTOR_12) && (address >= ADDR_FLASH_SECTOR_11)) {
+        sector = FLASH_Sector_11;
+    } else if ((address < ADDR_FLASH_SECTOR_13) && (address >= ADDR_FLASH_SECTOR_12)) {
+        sector = FLASH_Sector_12;
+    } else if ((address < ADDR_FLASH_SECTOR_14) && (address >= ADDR_FLASH_SECTOR_13)) {
+        sector = FLASH_Sector_13;
+    } else if ((address < ADDR_FLASH_SECTOR_15) && (address >= ADDR_FLASH_SECTOR_14)) {
+        sector = FLASH_Sector_14;
+    } else if ((address < ADDR_FLASH_SECTOR_16) && (address >= ADDR_FLASH_SECTOR_15)) {
+        sector = FLASH_Sector_15;
+    } else if ((address < ADDR_FLASH_SECTOR_17) && (address >= ADDR_FLASH_SECTOR_16)) {
+        sector = FLASH_Sector_16;
+    } else if ((address < ADDR_FLASH_SECTOR_18) && (address >= ADDR_FLASH_SECTOR_17)) {
+        sector = FLASH_Sector_17;
+    } else if ((address < ADDR_FLASH_SECTOR_19) && (address >= ADDR_FLASH_SECTOR_18)) {
+        sector = FLASH_Sector_18;
+    } else if ((address < ADDR_FLASH_SECTOR_20) && (address >= ADDR_FLASH_SECTOR_19)) {
+        sector = FLASH_Sector_19;
+    } else if ((address < ADDR_FLASH_SECTOR_21) && (address >= ADDR_FLASH_SECTOR_20)) {
+        sector = FLASH_Sector_20;
+    } else if ((address < ADDR_FLASH_SECTOR_22) && (address >= ADDR_FLASH_SECTOR_21)) {
+        sector = FLASH_Sector_21;
+    } else if ((address < ADDR_FLASH_SECTOR_23) && (address >= ADDR_FLASH_SECTOR_22)) {
+        sector = FLASH_Sector_22;
+    } else /*(address < FLASH_END_ADDR) && (address >= ADDR_FLASH_SECTOR_23))*/
+    {
+        sector = FLASH_Sector_23;
+    }
+
+    return sector;
+}
+
+/**
+ * Get the sector size
+ *
+ * @param sector sector
+ *
+ * @return sector size
+ */
+static uint32_t stm32_get_sector_size(uint32_t sector) {
+    EF_ASSERT(IS_FLASH_SECTOR(sector));
+
+    switch (sector) {
+    case 0: return 16 * 1024;
+    case 1: return 16 * 1024;
+    case 2: return 16 * 1024;
+    case 3: return 16 * 1024;
+    case 4: return 64 * 1024;
+    case 5: return 128 * 1024;
+    case 6: return 128 * 1024;
+    case 7: return 128 * 1024;
+    case 8: return 128 * 1024;
+    case 9: return 128 * 1024;
+    case 10: return 128 * 1024;
+    case 11: return 128 * 1024;
+    case 12: return 16 * 1024;
+    case 13: return 16 * 1024;
+    case 14: return 16 * 1024;
+    case 15: return 16 * 1024;
+    case 16: return 64 * 1024;
+    case 17: return 128 * 1024;
+    case 18: return 128 * 1024;
+    case 19: return 128 * 1024;
+    case 20: return 128 * 1024;
+    case 21: return 128 * 1024;
+    case 22: return 128 * 1024;
+    case 23: return 128 * 1024;
+    default : return 128 * 1024;
+    }
 }
 
 /**

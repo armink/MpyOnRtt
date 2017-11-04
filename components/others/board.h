@@ -15,12 +15,13 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
-#include <stm32f2xx.h>
+#include <stm32f4xx.h>
 
 // <o> Internal SRAM memory size[Kbytes] <8-128>
-//	<i>Default: 64
-#define STM32_SRAM_SIZE         112
-#define STM32_SRAM_END          (0x20000000 + STM32_SRAM_SIZE * 1024)
+//	<i>Default: 124
+#define STM32_SRAM_BEGIN        SRAM_BASE
+#define STM32_SRAM_SIZE         128
+#define STM32_SRAM_END          (SRAM_BASE + STM32_SRAM_SIZE * 1024)
 
 /* RT_USING_UART */
 #define RT_USING_UART1
@@ -48,8 +49,8 @@
     }                                            \
 }
 
-#define SYSTERM_RUN_LED_ON                    GPIO_SetBits  (GPIOC,GPIO_Pin_7 )                     //LED1ÁÁ
-#define SYSTERM_RUN_LED_OFF                   GPIO_ResetBits(GPIOC,GPIO_Pin_7 )                     //LED1Ãð
+#define SYSTERM_RUN_LED_ON                    GPIO_SetBits  (GPIOB,GPIO_Pin_12)                     //LED1ÁÁ
+#define SYSTERM_RUN_LED_OFF                   GPIO_ResetBits(GPIOB,GPIO_Pin_12)                     //LED1Ãð
 
 void rt_hw_board_init(void);
 void IWDG_Feed(void);

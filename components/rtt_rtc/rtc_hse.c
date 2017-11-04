@@ -117,14 +117,14 @@ static int RTC_Configuration(void)
     /* Allow access to RTC */
     PWR_BackupAccessCmd(ENABLE);
     /* Select the RTC Clock Source */
-    RCC_RTCCLKConfig(RCC_RTCCLKSource_HSE_Div25);
+    RCC_RTCCLKConfig(RCC_RTCCLKSource_HSE_Div8);
     /* Enable the RTC Clock */
     RCC_RTCCLKCmd(ENABLE);
     /* It's the first configuration */
     if (RTC_ReadBackupRegister(RTC_BKP_DR0) != INIT_FLAG) {
         /* Calendar Configuration */
-        RTC_InitStructure.RTC_AsynchPrediv = 125 - 1;
-        RTC_InitStructure.RTC_SynchPrediv = 8000 - 1;
+        RTC_InitStructure.RTC_AsynchPrediv = 100 - 1;
+        RTC_InitStructure.RTC_SynchPrediv = 10000 - 1;
         RTC_InitStructure.RTC_HourFormat = RTC_HourFormat_24;
         RTC_Init(&RTC_InitStructure);
         /* Set the Time */

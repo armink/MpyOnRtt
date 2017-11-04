@@ -16,24 +16,13 @@
  * 2016-05-28     armink       add DMA Rx mode
  */
 
-//#include "stm32f4xx.h"
-
-#include <stm32f2xx.h>
+#include "stm32f4xx.h"
 #include "usart.h"
 #include "board.h"
-#include <stm32f2xx_dma.h>
 
 #include <rtdevice.h>
 
 /* UART GPIO define. */
-//#define UART1_GPIO_TX       GPIO_Pin_6
-//#define UART1_TX_PIN_SOURCE GPIO_PinSource6
-//#define UART1_GPIO_RX       GPIO_Pin_7
-//#define UART1_RX_PIN_SOURCE GPIO_PinSource7
-//#define UART1_GPIO          GPIOB
-//#define UART1_GPIO_RCC      RCC_AHB1Periph_GPIOB
-//#define RCC_APBPeriph_UART1 RCC_APB2Periph_USART1
-
 #define UART1_GPIO_TX       GPIO_Pin_9
 #define UART1_TX_PIN_SOURCE GPIO_PinSource9
 #define UART1_GPIO_RX       GPIO_Pin_10
@@ -42,12 +31,12 @@
 #define UART1_GPIO_RCC      RCC_AHB1Periph_GPIOA
 #define RCC_APBPeriph_UART1 RCC_APB2Periph_USART1
 
-#define UART2_GPIO_TX       GPIO_Pin_2
-#define UART2_TX_PIN_SOURCE GPIO_PinSource2
-#define UART2_GPIO_RX       GPIO_Pin_3
-#define UART2_RX_PIN_SOURCE GPIO_PinSource3
-#define UART2_GPIO          GPIOA
-#define UART2_GPIO_RCC      RCC_AHB1Periph_GPIOA
+#define UART2_GPIO_TX       GPIO_Pin_5
+#define UART2_TX_PIN_SOURCE GPIO_PinSource5
+#define UART2_GPIO_RX       GPIO_Pin_6
+#define UART2_RX_PIN_SOURCE GPIO_PinSource6
+#define UART2_GPIO          GPIOD
+#define UART2_GPIO_RCC      RCC_AHB1Periph_GPIOD
 #define RCC_APBPeriph_UART2 RCC_APB1Periph_USART2
 
 #define UART3_GPIO_TX       GPIO_Pin_8
@@ -634,8 +623,8 @@ static void NVIC_Configuration(struct stm32_uart *uart)
 
     /* Enable the USART1 Interrupt */
     NVIC_InitStructure.NVIC_IRQChannel = uart->irq;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 }
@@ -668,7 +657,7 @@ static void DMA_Configuration(struct rt_serial_device *serial) {
     NVIC_Init(&NVIC_InitStructure);
 }
 
-int stm32_hw_usart_init(void)
+int rt_hw_usart_init(void)
 {
     struct stm32_uart *uart;
     struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;
@@ -752,4 +741,4 @@ int stm32_hw_usart_init(void)
 #endif /* RT_USING_UART5 */
     return 0;
 }
-INIT_BOARD_EXPORT(stm32_hw_usart_init);
+INIT_BOARD_EXPORT(rt_hw_usart_init);

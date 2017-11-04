@@ -19,22 +19,14 @@
 #include <spi_flash_sfud.h>
 #include <partition.h>
 
-#define SOFTWARE_VERSION     "0.11.01"
+#define SOFTWARE_VERSION     "0.11.04"
 
-#ifdef __CC_ARM
-extern int Image$$RW_IRAM1$$ZI$$Limit;
-#elif __ICCARM__
-#pragma section="HEAP"
-#else
-extern int __bss_end;
-#endif
-
-uint8_t CpuUsageMajor, CpuUsageMinor; //CPU使用率
+uint8_t CpuUsageMajor, CpuUsageMinor;
 rt_uint32_t Total_Mem, Used_Mem, Max_Used_Mem;
 
-#define thread_SysMonitor_Prio                30             //系统监控线程优先级
+#define thread_SysMonitor_Prio                30
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t thread_SysMonitor_stack[512];            //系统监控线程堆栈
+static rt_uint8_t thread_SysMonitor_stack[512];
 struct rt_thread thread_SysMonitor;
 rt_spi_flash_device_t nor_flash;
 
@@ -90,18 +82,6 @@ void sys_init_thread(void* parameter){
     finsh_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 
-    /* 初始化 W25Q128 Flash 设备 */
-    if ((nor_flash = rt_sfud_flash_probe("nor_flash", "spi10")) == NULL) {
-        /* Flash 初始化失败 */
-        set_system_status(SYSTEM_STATUS_FAULT);
-        return;
-    }
-
-    /* 初始化 Flash 上的各个分区 */
-    extern int rt_partition_init(const char* flash_device, const struct rt_partition* parts, rt_size_t num);
-    static const struct rt_partition partition[] = RT_PARTITION_DEFAULT_TABLE;
-    rt_partition_init("nor_flash", partition, sizeof(partition) / sizeof(struct rt_partition));
-
     /* 初始化 EasyFlash 模块 */
     easyflash_init();
     /* 初始化日志系统 */
@@ -137,14 +117,7 @@ void sys_init_thread(void* parameter){
     rt_assert_set_hook(rtt_user_assert_hook);
 
     /* CmBacktrace 组件初始化 */
-    cm_backtrace_init("ART_WiFi", HARDWARE_VERSION, SOFTWARE_VERSION);
-
-    /* 挂载 spi nor flash 的 fatfs 分区作为根目录 */
-    if (dfs_mount("fatfs", "/", "elm", 0, 0) == 0) {
-        log_i("文件系统初始化成功");
-    } else {
-        log_e("文件系统初始化失败！");
-    }
+    cm_backtrace_init("MpyOnRtt", HARDWARE_VERSION, SOFTWARE_VERSION);
 
     set_system_status(SYSTEM_STATUS_RUN);
 }
@@ -256,7 +229,7 @@ void rtthread_startup(void)
 
 #ifdef RT_USING_HEAP
     /* init memory system */
-    rt_system_heap_init(__segment_end("HEAP"), (void*)STM32_SRAM_END);
+    rt_system_heap_init((void*)STM32_SRAM_BEGIN, (void*)STM32_SRAM_END);
 #endif
 
     /* init scheduler system */
