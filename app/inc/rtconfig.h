@@ -133,6 +133,7 @@
 /* SECTION: C Runtime library setting */
 // <bool name="RT_USING_LIBC" description="Using C library" default="true" />
 #define RT_USING_LIBC
+#define RT_USING_POSIX
 // <bool name="RT_USING_PTHREADS" description="Using POSIX threads library" default="true" />
 //#define RT_USING_PTHREADS
 

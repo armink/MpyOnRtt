@@ -71,8 +71,7 @@ void sys_init_thread(void* parameter){
     rt_components_init();
 #endif
 
-#ifdef RT_USING_FINSH
-    /* 设置 finsh 控制台设备名称 */
+#if defined(RT_USING_FINSH) && !defined(RT_USING_POSIX)
     finsh_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 
