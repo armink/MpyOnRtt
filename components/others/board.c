@@ -17,13 +17,22 @@
 
 #include "board.h"
 
-/*******************************************************************************
-* Function Name  : NVIC_Configuration
-* Description    : Configures Vector Table base location.
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+static void RCC_Configuration(void)
+{
+    RCC_ClocksTypeDef  rcc_clocks;
+
+    RCC_GetClocksFreq(&rcc_clocks);
+    /* 确认晶振完全起振 */
+    assert_param(rcc_clocks.HCLK_Frequency == 168000000);
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | \
+                           RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | \
+                           RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOG,
+                           ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+}
+
 void NVIC_Configuration(void)
 {
 #ifdef  VECT_TAB_RAM
@@ -62,9 +71,7 @@ static void GPIO_Configuration(void)
     GPIO_Init(GPIOG, &GPIO_InitStructure);
 
     /* 系统运行指示灯初始化 */
-    GPIO_SetBits(GPIOE, GPIO_Pin_1);
-    /* 点亮报警提示灯 */
-    GPIO_SetBits(GPIOA, GPIO_Pin_6);
+    GPIO_SetBits(GPIOB, GPIO_Pin_12);
 }
 
 static void IWDG_Configuration(void)
@@ -131,7 +138,8 @@ void SysTick_Handler(void)
  */
 void rt_hw_board_init()
 {
-    /* NVIC Configuration */
+    RCC_Configuration();
+
     NVIC_Configuration();
 
     GPIO_Configuration();

@@ -16,7 +16,7 @@
  * 2016-05-28     armink       add DMA Rx mode
  */
 
-#include "stm32f4xx.h"
+#include "stm32f4xx_conf.h"
 #include "usart.h"
 #include "board.h"
 
@@ -31,20 +31,20 @@
 #define UART1_GPIO_RCC      RCC_AHB1Periph_GPIOA
 #define RCC_APBPeriph_UART1 RCC_APB2Periph_USART1
 
-#define UART2_GPIO_TX       GPIO_Pin_5
-#define UART2_TX_PIN_SOURCE GPIO_PinSource5
-#define UART2_GPIO_RX       GPIO_Pin_6
-#define UART2_RX_PIN_SOURCE GPIO_PinSource6
-#define UART2_GPIO          GPIOD
-#define UART2_GPIO_RCC      RCC_AHB1Periph_GPIOD
+#define UART2_GPIO_TX       GPIO_Pin_2
+#define UART2_TX_PIN_SOURCE GPIO_PinSource2
+#define UART2_GPIO_RX       GPIO_Pin_3
+#define UART2_RX_PIN_SOURCE GPIO_PinSource3
+#define UART2_GPIO          GPIOA
+#define UART2_GPIO_RCC      RCC_AHB1Periph_GPIOA
 #define RCC_APBPeriph_UART2 RCC_APB1Periph_USART2
 
-#define UART3_GPIO_TX       GPIO_Pin_8
-#define UART3_TX_PIN_SOURCE GPIO_PinSource8
-#define UART3_GPIO_RX       GPIO_Pin_9
-#define UART3_RX_PIN_SOURCE GPIO_PinSource9
-#define UART3_GPIO          GPIOD
-#define UART3_GPIO_RCC      RCC_AHB1Periph_GPIOD
+#define UART3_GPIO_TX       GPIO_Pin_10
+#define UART3_TX_PIN_SOURCE GPIO_PinSource10
+#define UART3_GPIO_RX       GPIO_Pin_11
+#define UART3_RX_PIN_SOURCE GPIO_PinSource11
+#define UART3_GPIO          GPIOB
+#define UART3_GPIO_RCC      RCC_AHB1Periph_GPIOB
 #define RCC_APBPeriph_UART3 RCC_APB1Periph_USART3
 
 #define UART4_GPIO_TX       GPIO_Pin_10
