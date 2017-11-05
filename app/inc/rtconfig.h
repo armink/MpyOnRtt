@@ -69,6 +69,8 @@
 #define RT_SERIAL_RB_BUFSZ 1024
 // <bool name="RT_USING_RTC" description="Using RTC" default="true" />
 #define RT_USING_RTC
+// <bool name="RT_USING_PIN" description="Using generic GPIO device drivers" default="true" />
+#define RT_USING_PIN
 // <bool name="RT_USING_SPI" description="Using SPI Device Driver Framework" default="true" />
 #define RT_USING_SPI
 
