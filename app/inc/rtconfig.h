@@ -91,6 +91,8 @@
 #define FINSH_USING_MSH_DEFAULT
 /* command line max length */
 #define FINSH_CMD_SIZE 256
+/* finsh thread stack size */
+#define FINSH_THREAD_STACK_SIZE 4096
 /* Only enabled when firmware is released */
 #ifdef RELEASE
 /* Using password authentication */
