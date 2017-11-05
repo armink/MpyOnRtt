@@ -78,7 +78,7 @@
  * @note the log area size must be more than twice of EF_ERASE_MIN_SIZE
  */
 /* backup area start address */
-#define EF_START_ADDR             (FLASH_BASE + 256 * 1024) /* on the chip position: 256KB */
+#define EF_START_ADDR             (FLASH_BASE + 512 * 1024) /* on the chip position: 512KB */
 /* the user setting size of ENV, must be word alignment */
 #define ENV_USER_SETTING_SIZE     (2 * 1024)
 #ifndef EF_ENV_USING_PFS_MODE
