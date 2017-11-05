@@ -35,6 +35,7 @@
 #include "py/repl.h"
 #include "py/gc.h"
 #include "py/mperrno.h"
+#include "py/stackctrl.h"
 #include "lib/utils/pyexec.h"
 
 #if MICROPY_ENABLE_COMPILER
@@ -62,6 +63,10 @@ void mpy_main(const char *filename) {
     stack_top = (char*)&stack_dummy;
 
     rt_kprintf("\n");
+
+    mp_stack_set_top(stack_top);
+    // Make MicroPython's stack limit somewhat smaller than full stack available
+    mp_stack_set_limit(FINSH_THREAD_STACK_SIZE - 512);
 
     #if MICROPY_ENABLE_GC
     gc_init(heap, heap + sizeof(heap));

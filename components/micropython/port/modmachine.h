@@ -24,25 +24,19 @@
  * THE SOFTWARE.
  */
 
-#include <rtthread.h>
+#ifndef _MODMACHINE_H
+#define _MODMACHINE_H
 
-static inline mp_uint_t mp_hal_ticks_us(void) {
-    return rt_tick_get() * 1000;
-}
+#include "py/obj.h"
 
-static inline mp_uint_t mp_hal_ticks_ms(void) {
-    return rt_tick_get();
-}
+extern const mp_obj_type_t machine_pin_type;
 
-static inline mp_uint_t mp_hal_ticks_cpu(void) {
-    return rt_tick_get() * 1000;
-}
+MP_DECLARE_CONST_FUN_OBJ_0(machine_info_obj);
 
-static inline void mp_hal_delay_us(mp_uint_t delay) {
-    rt_thread_delay(rt_tick_from_millisecond(delay / 1000));
-}
+typedef struct _machine_pin_obj_t {
+    mp_obj_base_t base;
+    struct device *port;
+    uint32_t pin;
+} machine_pin_obj_t;
 
-static inline void mp_hal_delay_ms(mp_uint_t delay) {
-    rt_thread_delay(rt_tick_from_millisecond(delay));
-}
-
+#endif // _MODMACHINE_H

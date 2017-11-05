@@ -24,25 +24,17 @@
  * THE SOFTWARE.
  */
 
-#include <rtthread.h>
+#include "py/builtin.h"
 
-static inline mp_uint_t mp_hal_ticks_us(void) {
-    return rt_tick_get() * 1000;
-}
-
-static inline mp_uint_t mp_hal_ticks_ms(void) {
-    return rt_tick_get();
-}
-
-static inline mp_uint_t mp_hal_ticks_cpu(void) {
-    return rt_tick_get() * 1000;
-}
-
-static inline void mp_hal_delay_us(mp_uint_t delay) {
-    rt_thread_delay(rt_tick_from_millisecond(delay / 1000));
-}
-
-static inline void mp_hal_delay_ms(mp_uint_t delay) {
-    rt_thread_delay(rt_tick_from_millisecond(delay));
-}
-
+const char rtthread_help_text[] =
+"Welcome to MicroPython on RT-Thread!\n"
+"\n"
+"Control commands:\n"
+"  CTRL-A        -- on a blank line, enter raw REPL mode\n"
+"  CTRL-B        -- on a blank line, enter normal REPL mode\n"
+"  CTRL-C        -- interrupt a running program\n"
+"  CTRL-D        -- on a blank line, do a soft reset of the board\n"
+"  CTRL-E        -- on a blank line, enter paste mode\n"
+"\n"
+"For further help on a specific object, type help(obj)\n"
+;
