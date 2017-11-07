@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include <rtthread.h>
+#include <shell.h>
 
 #include "py/compile.h"
 #include "py/runtime.h"

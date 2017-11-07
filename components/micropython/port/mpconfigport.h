@@ -25,6 +25,7 @@
  */
 
 #include <stdint.h>
+#include <libc/libc_errno.h>
 
 // options to control how MicroPython is built
 
@@ -97,6 +98,24 @@
 #define MICROPY_LONGINT_IMPL        (MICROPY_LONGINT_IMPL_NONE)
 #define MICROPY_FLOAT_IMPL          (MICROPY_FLOAT_IMPL_NONE)
 
+#if defined(__CC_ARM)
+//TODO
+#elif defined(__ICCARM__)
+//#include <sys/types.h>
+#define MICROPY_NO_ALLOCA           1
+#define NORETURN                    __noreturn
+#define MP_WEAK                     __weak
+#define MP_NOINLINE
+#define MP_ALWAYSINLINE
+#define MP_LIKELY(x)               x
+#define MP_UNLIKELY(x)             x
+#elif defined(__GNUC__)
+// We need to provide a declaration/definition of alloca()
+#include <alloca.h>
+#else
+    #error "not supported compiler"
+#endif /* defined(__CC_ARM) */
+
 // type definitions for the specific machine
 
 #define MICROPY_MAKE_POINTER_CALLABLE(p) ((void*)((mp_uint_t)(p) | 1))
@@ -117,9 +136,6 @@ typedef long mp_off_t;
 // extra built in names to add to the global namespace
 #define MICROPY_PORT_BUILTINS \
     { MP_ROM_QSTR(MP_QSTR_open), MP_ROM_PTR(&mp_builtin_open_obj) },
-
-// We need to provide a declaration/definition of alloca()
-#include <alloca.h>
 
 #define MICROPY_HW_BOARD_NAME "RT-Thread Board"
 #define MICROPY_HW_MCU_NAME "stm32f4"

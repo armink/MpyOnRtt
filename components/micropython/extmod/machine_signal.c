@@ -58,7 +58,7 @@ STATIC mp_obj_t signal_make_new(const mp_obj_type_t *type, size_t n_args, size_t
         // If first argument isn't a Pin-like object, we filter out "invert"
         // from keyword arguments and pass them all to the exported Pin
         // constructor to create one.
-        mp_obj_t pin_args[n_args + n_kw * 2];
+        mp_obj_t *pin_args = alloca(n_args + n_kw * 2);
         memcpy(pin_args, args, n_args * sizeof(mp_obj_t));
         const mp_obj_t *src = args + n_args;
         mp_obj_t *dst = pin_args + n_args;
