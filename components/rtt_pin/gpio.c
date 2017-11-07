@@ -15,12 +15,10 @@
 #include <rthw.h>
 #include <rtdevice.h>
 #include <board.h>
-#include <gpio.h>
-#include <stm32f4xx.h>
 
 #ifdef RT_USING_PIN
 
-#define STM32F10X_PIN_NUMBERS 64 //[48, 64, 100, 144 ]
+#define STM32_PIN_NUMBERS 64 //[48, 64, 100, 144 ]
 
 #define __STM32_PIN(index, rcc, gpio, gpio_index) { 0, RCC_##rcc##Periph_GPIO##gpio, GPIO##gpio, GPIO_Pin_##gpio_index}
 #define __STM32_PIN_DEFAULT {-1, 0, 0, 0}
@@ -51,7 +49,7 @@ struct pin_irq
 
 static const struct pin_index pins[] =
 {
-#if (STM32F10X_PIN_NUMBERS == 48)
+#if (STM32_PIN_NUMBERS == 48)
     __STM32_PIN_DEFAULT,
     __STM32_PIN_DEFAULT,
     __STM32_PIN(2, AHB1, C, 13),
@@ -103,7 +101,7 @@ static const struct pin_index pins[] =
     __STM32_PIN_DEFAULT,
 
 #endif
-#if (STM32F10X_PIN_NUMBERS == 64)
+#if (STM32_PIN_NUMBERS == 64)
     __STM32_PIN_DEFAULT,
     __STM32_PIN_DEFAULT,
     __STM32_PIN(2, AHB1, C, 13),
@@ -170,7 +168,7 @@ static const struct pin_index pins[] =
     __STM32_PIN_DEFAULT,
     __STM32_PIN_DEFAULT,
 #endif
-#if (STM32F10X_PIN_NUMBERS == 100)
+#if (STM32_PIN_NUMBERS == 100)
     __STM32_PIN_DEFAULT,
     __STM32_PIN(1, AHB1, E, 2),
     __STM32_PIN(2, AHB1, E, 3),
@@ -273,7 +271,7 @@ static const struct pin_index pins[] =
     __STM32_PIN_DEFAULT,
     __STM32_PIN_DEFAULT,
 #endif
-#if (STM32F10X_PIN_NUMBERS == 144)
+#if (STM32_PIN_NUMBERS == 144)
     __STM32_PIN_DEFAULT,
     __STM32_PIN(1, AHB1, E, 2),
     __STM32_PIN(2, AHB1, E, 3),
@@ -523,7 +521,7 @@ void stm32_pin_mode(rt_device_t dev, rt_base_t pin, rt_base_t mode)
     /* Configure GPIO_InitStructure */
     GPIO_InitStructure.GPIO_Pin   = index->pin;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
     if (mode == PIN_MODE_OUTPUT)
     {
@@ -735,15 +733,9 @@ rt_err_t stm32_pin_irq_enable(struct rt_device *device, rt_base_t pin, rt_uint32
             rt_hw_interrupt_enable(level);
             return -RT_ENOSYS;
         }
-        /* Connect EXTI Line to GPIO */
+        /* select the input source pin for the EXTI line */
         SYSCFG_EXTILineConfig(irq->port_source, irq->pin_source);
-
-        NVIC_InitStructure.NVIC_IRQChannel = irq->irq_exti_channel;
-        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
-        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-        NVIC_Init(&NVIC_InitStructure);
-
+        /* select the mode(interrupt, event) and configure the trigger selection */
         EXTI_InitStructure.EXTI_Line = irq->exti_line;
         EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
         switch (pin_irq_hdr_tab[irqindex].mode)
@@ -760,6 +752,13 @@ rt_err_t stm32_pin_irq_enable(struct rt_device *device, rt_base_t pin, rt_uint32
         }
         EXTI_InitStructure.EXTI_LineCmd = ENABLE;
         EXTI_Init(&EXTI_InitStructure);
+        /* configure NVIC IRQ channel mapped to the EXTI line */
+        NVIC_InitStructure.NVIC_IRQChannel = irq->irq_exti_channel;
+        NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+        NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+        NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+        NVIC_Init(&NVIC_InitStructure);
+
         rt_hw_interrupt_enable(level);
     }
     else if (enabled == PIN_IRQ_DISABLE)
@@ -795,6 +794,9 @@ const static struct rt_pin_ops _stm32_pin_ops =
 int stm32_hw_pin_init(void)
 {
     int result;
+
+    /* enable SYSCFG clock for EXTI */
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
     result = rt_device_pin_register("pin", &_stm32_pin_ops, RT_NULL);
     return result;
