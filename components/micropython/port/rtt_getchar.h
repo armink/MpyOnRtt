@@ -24,25 +24,11 @@
  * THE SOFTWARE.
  */
 
-#include "py/mpconfig.h"
-#include "rtt_getchar.h"
-#include <rtthread.h>
+#ifndef _RTT_GETCHAR_H_
+#define _RTT_GETCHAR_H_
 
-/*
- * Core UART functions to implement for a port
- */
+void rtt_getchar_init(void);
+void rtt_getchar_deinit(void);
+int rtt_getchar(void);
 
-// Receive single character
-int mp_hal_stdin_rx_chr(void) {
-    return rtt_getchar();
-}
-
-// Send string of given length
-void mp_hal_stdout_tx_strn(const char *str, mp_uint_t len) {
-    rt_device_t console;
-
-    console = rt_console_get_device();
-    if (console) {
-        rt_device_write(console, 0, str, len);
-    }
-}
+#endif /* _RTT_GETCHAR_H_ */

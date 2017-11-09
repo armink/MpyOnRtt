@@ -38,6 +38,7 @@
 #include "py/mperrno.h"
 #include "py/stackctrl.h"
 #include "lib/utils/pyexec.h"
+#include "rtt_getchar.h"
 
 #if MICROPY_ENABLE_COMPILER
 void do_str(const char *src, mp_parse_input_kind_t input_kind) {
@@ -64,6 +65,8 @@ void mpy_main(const char *filename) {
     stack_top = (char*)&stack_dummy;
 
     rt_kprintf("\n");
+
+    rtt_getchar_init();
 
     mp_stack_set_top(stack_top);
     // Make MicroPython's stack limit somewhat smaller than full stack available
@@ -97,6 +100,8 @@ void mpy_main(const char *filename) {
         #endif
     }
     mp_deinit();
+
+    rtt_getchar_deinit();
 }
 
 void gc_collect(void) {
