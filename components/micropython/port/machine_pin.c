@@ -154,8 +154,7 @@ STATIC mp_obj_t machine_pin_call(mp_obj_t self_in, size_t n_args, size_t n_kw, c
     mp_arg_check_num(n_args, n_kw, 0, 1, false);
     machine_pin_obj_t *self = self_in;
     if (n_args == 0) {
-        uint32_t pin_val = rt_pin_read(self->pin);
-        return MP_OBJ_NEW_SMALL_INT(pin_val);
+        return mp_obj_new_bool(rt_pin_read(self->pin));
     } else {
         rt_pin_write(self->pin, mp_obj_is_true(args[0]));
         return mp_const_none;
