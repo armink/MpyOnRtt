@@ -24,6 +24,7 @@
 #define STM32_SRAM_END          (SRAM_BASE + STM32_SRAM_SIZE * 1024)
 
 /* RT_USING_UART */
+#define RT_USING_UART1
 #define RT_USING_UART3
 
 /* RT_USING_SPI */
