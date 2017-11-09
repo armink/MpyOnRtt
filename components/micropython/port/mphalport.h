@@ -31,11 +31,11 @@ static inline mp_uint_t mp_hal_ticks_us(void) {
 }
 
 static inline mp_uint_t mp_hal_ticks_ms(void) {
-    return rt_tick_get();
+    return rt_tick_get() * 1000 / RT_TICK_PER_SECOND;
 }
 
 static inline mp_uint_t mp_hal_ticks_cpu(void) {
-    return rt_tick_get() * 1000;
+    return rt_tick_get();
 }
 
 static inline void mp_hal_delay_us(mp_uint_t delay) {
