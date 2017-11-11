@@ -56,6 +56,20 @@ STATIC mp_obj_t mod_stacks_analyze(void) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(mod_stacks_analyze_obj, mod_stacks_analyze);
 
+STATIC mp_obj_t os_sync(void) {
+    //TODO
+    MP_RTT_NOT_IMPL_PRINT;
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_0(mod_os_sync_obj, os_sync);
+
+STATIC mp_obj_t mp_os_mount(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+    //TODO
+    rt_kprintf("NOT implement, Please add for your board!\n");
+    return mp_const_none;
+}
+MP_DEFINE_CONST_FUN_OBJ_KW(mp_os_mount_obj, 2, mp_os_mount);
+
 STATIC const mp_rom_map_elem_t mp_module_rtthread_globals_table[] = {
     { MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_rtthread) },
     { MP_ROM_QSTR(MP_QSTR_is_preempt_thread), MP_ROM_PTR(&mod_is_preempt_thread_obj) },

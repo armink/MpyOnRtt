@@ -24,29 +24,13 @@
  * THE SOFTWARE.
  */
 
-#ifndef _MODMACHINE_H
-#define _MODMACHINE_H
+#ifndef _PORTMODULES_H
+#define _PORTMODULES_H
 
-#include "py/obj.h"
-#include <rtthread.h>
+MP_DECLARE_CONST_FUN_OBJ_1(time_sleep_ms_obj);
+MP_DECLARE_CONST_FUN_OBJ_1(time_sleep_us_obj);
 
-extern const mp_obj_type_t machine_pin_type;
+MP_DECLARE_CONST_FUN_OBJ_0(mod_os_sync_obj);
+MP_DECLARE_CONST_FUN_OBJ_KW(mp_os_mount_obj);
 
-MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(machine_info_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(machine_unique_id_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(machine_reset_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(machine_bootloader_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(machine_freq_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(pyb_wfi_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(pyb_disable_irq_obj);
-MP_DECLARE_CONST_FUN_OBJ_VAR_BETWEEN(pyb_enable_irq_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(machine_sleep_obj);
-MP_DECLARE_CONST_FUN_OBJ_0(machine_deepsleep_obj);
-
-typedef struct _machine_pin_obj_t {
-    mp_obj_base_t base;
-    char name[RT_NAME_MAX];
-    uint32_t pin;
-} machine_pin_obj_t;
-
-#endif // _MODMACHINE_H
+#endif // _PORTMODULES_H

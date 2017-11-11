@@ -153,9 +153,10 @@ typedef long mp_off_t;
 
 #define MICROPY_PORT_ROOT_POINTERS     const char *readline_hist[8];
 
-extern const struct _mp_obj_module_t mp_module_machine;
-extern const struct _mp_obj_module_t mp_module_time;
+extern const struct _mp_obj_module_t pyb_module;
 extern const struct _mp_obj_module_t mp_module_rtthread;
+extern const struct _mp_obj_module_t mp_module_time;
+extern const struct _mp_obj_module_t mp_module_machine;
 
 #if MICROPY_PY_RTTHREAD
 #define MICROPY_PY_RTTHREAD_DEF { MP_ROM_QSTR(MP_QSTR_rtthread), MP_ROM_PTR(&mp_module_rtthread) },
@@ -165,9 +166,12 @@ extern const struct _mp_obj_module_t mp_module_rtthread;
 
 #define MICROPY_PORT_BUILTIN_MODULES \
     { MP_ROM_QSTR(MP_QSTR_machine), MP_ROM_PTR(&mp_module_machine) }, \
+    { MP_ROM_QSTR(MP_QSTR_pyb), MP_ROM_PTR(&pyb_module) }, \
     MICROPY_PY_RTTHREAD_DEF \
 
 #define MICROPY_PORT_BUILTIN_MODULE_WEAK_LINKS \
     { MP_ROM_QSTR(MP_QSTR_time), MP_ROM_PTR(&mp_module_time) }, \
 
+
+#define MP_RTT_NOT_IMPL_PRINT rt_kprintf("Not implement on %s:%ld, Please add for your board!\n", __FILE__, __FUNCTION__)
 
