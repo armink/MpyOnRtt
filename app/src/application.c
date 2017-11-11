@@ -14,7 +14,7 @@
 #include <finsh.h>
 #include <cm_backtrace.h>
 
-#define SOFTWARE_VERSION     "0.11.04"
+#define SOFTWARE_VERSION     "0.11.11"
 
 uint8_t CpuUsageMajor, CpuUsageMinor;
 rt_uint32_t Total_Mem, Used_Mem, Max_Used_Mem;
