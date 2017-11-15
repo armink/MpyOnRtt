@@ -10,3 +10,7 @@
 *.dblite
 *.map
 *.o
+*.bin
+*.axf
+*.elf
+*.hex

@@ -8,12 +8,15 @@
 
 #define RT_NAME_MAX 24
 #define RT_ALIGN_SIZE 4
+/* RT_THREAD_PRIORITY_8 is not set */
+#define RT_THREAD_PRIORITY_32
+/* RT_THREAD_PRIORITY_256 is not set */
 #define RT_THREAD_PRIORITY_MAX 32
 #define RT_TICK_PER_SECOND 1000
 #define RT_DEBUG
 #define RT_USING_OVERFLOW_CHECK
 #define RT_DEBUG_INIT 0
-/* RT_DEBUG_THREAD is not set */
+#define RT_DEBUG_THREAD 0
 #define RT_USING_HOOK
 #define IDLE_THREAD_STACK_SIZE 256
 #define RT_USING_TIMER_SOFT
@@ -33,13 +36,15 @@
 
 #define RT_USING_MEMPOOL
 /* RT_USING_MEMHEAP is not set */
-#define RT_USING_HEAP
+/* RT_USING_NOHEAP is not set */
 #define RT_USING_SMALL_MEM
 /* RT_USING_SLAB is not set */
+#define RT_USING_HEAP
 
 /* Kernel Device Object */
 
 #define RT_USING_DEVICE
+/* RT_USING_INTERRUPT_INFO is not set */
 #define RT_USING_CONSOLE
 #define RT_CONSOLEBUF_SIZE 1024
 #define RT_CONSOLE_DEVICE_NAME "uart1"
@@ -51,7 +56,7 @@
 /* RT-Thread Components */
 
 #define RT_USING_COMPONENTS_INIT
-#define RT_USING_USER_MAIN
+/* RT_USING_USER_MAIN is not set */
 
 /* C++ features */
 
