@@ -4,3 +4,4 @@
 /EWARM/Debug
 /settings
 /.settings
+*.pyc
