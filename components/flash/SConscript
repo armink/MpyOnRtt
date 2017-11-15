@@ -8,6 +8,6 @@ src    += Glob('port/*.c')
 
 path    = [cwd + '/inc']
 
-group = DefineGroup('EasyFlash', src, depend = ['RT_USING_EasyFlash'], CPPPATH = path)
+group = DefineGroup('EasyFlash', src, depend = [''], CPPPATH = path)
 
 Return('group')

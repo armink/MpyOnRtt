@@ -10,6 +10,6 @@ src    += Glob('plugins/flash/*.c')
 path    = [cwd + '/inc']
 path   += [cwd + '/plugins/flash']
 
-group = DefineGroup('EasyLogger', src, depend = ['RT_USING_EasyLogger'], CPPPATH = path)
+group = DefineGroup('EasyLogger', src, depend = [''], CPPPATH = path)
 
 Return('group')

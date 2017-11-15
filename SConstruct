@@ -2,10 +2,8 @@ import os
 import sys
 import rtconfig
 
-if os.getenv('RTT_ROOT'):
-    RTT_ROOT = os.getenv('RTT_ROOT')
-else:
-    RTT_ROOT = os.path.normpath(os.getcwd() + '/RT-Thread-3.0.0')
+# NOTE: set RTT_ROOT from project
+RTT_ROOT = os.path.normpath(os.getcwd() + '/RT-Thread-3.0.0')
 
 sys.path = sys.path + [os.path.join(RTT_ROOT, 'tools')]
 try:
@@ -33,7 +31,7 @@ Export('RTT_ROOT')
 Export('rtconfig')
 
 # prepare building environment
-objs = PrepareBuilding(env, RTT_ROOT, has_libcpu=False)
+objs = PrepareBuilding(env, RTT_ROOT)
 
 # make a building
 DoBuilding(TARGET, objs)

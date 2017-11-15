@@ -4,6 +4,9 @@
 /EWARM/Debug
 /settings
 /.settings
+/build
 *.pyc
 *.old
 *.dblite
+*.map
+*.o
