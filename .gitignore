@@ -5,3 +5,5 @@
 /settings
 /.settings
 *.pyc
+*.old
+*.dblite

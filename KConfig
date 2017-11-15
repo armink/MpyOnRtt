@@ -18,6 +18,7 @@ config $PKGS_DIR
     option env="PKGS_ROOT"
     default "packages"
 
+source "$RTT_DIR/KConfig"
 source "$PKGS_DIR/KConfig"
 
 source "$BSP_DIR/drivers/Kconfig"
