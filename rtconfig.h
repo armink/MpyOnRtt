@@ -178,6 +178,7 @@
 /* language packages */
 
 /* PKG_USING_JERRYSCRIPT is not set */
+/* PKG_USING_MICROPYTHON is not set */
 
 /* multimedia packages */
 

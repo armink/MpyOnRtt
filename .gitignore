@@ -5,6 +5,7 @@
 /settings
 /.settings
 /build
+/packages
 *.pyc
 *.old
 *.dblite
