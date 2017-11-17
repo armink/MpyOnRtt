@@ -1,15 +1,13 @@
 /*
  * user_finsh_cmd.c
  *
- *  Created on: 2013Äê12ÔÂ7ÈÕ
+ *  Created on: 2013-12-7
  *      Author: Armink
  */
 #include <rthw.h>
 #include <rtthread.h>
 #include <finsh.h>
 #include "cpuusage.h"
-#include "elog_flash.h"
-#include "easyflash.h"
 #include <rtc.h>
 #include <time.h>
 

@@ -61,38 +61,13 @@ ElogErrCode elog_port_init(void) {
 }
 
 /**
- * 输出日志到控制台或者 flash 中
- *
- * @param console 是否输出到控制台
- * @param flash 是否输出到 flash 中
- * @param log 日志缓冲区
- * @param size 日志大小
- */
-void output_log_to_console_or_flash(bool console, bool flash, const char *log, size_t size) {
-#include <elog_flash.h>
-    if(console) {
-        rt_kprintf("%.*s", size, log);
-    }
-    if(flash) {
-        elog_flash_write(log, size);
-    }
-}
-
-/**
  * output log port interface
  *
  * @param log output of log
  * @param size log size
  */
 void elog_port_output(const char *log, size_t size) {
-    int8_t lvl = elog_find_lvl(log);
-    /* output to terminal */
-    output_log_to_console_or_flash(true, false, log, size);
-    /* 只将断言、错误及警告日志保存至 Flash */
-    if (lvl == ELOG_LVL_ASSERT || lvl == ELOG_LVL_ERROR || lvl == ELOG_LVL_WARN) {
-        /* output to flash */
-        output_log_to_console_or_flash(false, true, log, size);
-    }
+    rt_kprintf("%.*s", size, log);
 }
 
 #ifdef ELOG_ASYNC_OUTPUT_ENABLE

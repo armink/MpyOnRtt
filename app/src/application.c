@@ -6,8 +6,6 @@
 #include <utils.h>
 #include <board.h>
 #include <elog.h>
-#include <elog_flash.h>
-#include <easyflash.h>
 #include <delay_conf.h>
 #include <cpuusage.h>
 #include <shell.h>
@@ -75,8 +73,6 @@ void sys_init_thread(void* parameter){
     finsh_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif
 
-    /* 初始化 EasyFlash 模块 */
-    easyflash_init();
     /* 初始化日志系统 */
     elog_init();
     elog_set_fmt(ELOG_LVL_ASSERT, ELOG_FMT_ALL & ~ELOG_FMT_P_INFO);
@@ -95,8 +91,6 @@ void sys_init_thread(void* parameter){
 #ifdef ELOG_COLOR_ENABLE
     elog_set_text_color_enabled(true);
 #endif
-    /* 初始化EasyLogger的Flash插件 */
-    elog_flash_init();
     /* 启动EasyLogger */
     elog_start();
 
@@ -123,10 +117,8 @@ static void rtt_user_assert_hook(const char* ex, const char* func, rt_size_t lin
 #endif
 
     elog_output_lock_enabled(false);
-    elog_flash_lock_enabled(false);
     elog_a("rtt", "(%s) has assert failed at %s:%ld.", ex, func, line);
     cm_backtrace_assert(cmb_get_sp());
-    elog_flash_flush();
     while(1);
 }
 
@@ -138,10 +130,8 @@ static void elog_user_assert_hook(const char* ex, const char* func, size_t line)
 #endif
 
     elog_output_lock_enabled(false);
-    elog_flash_lock_enabled(false);
     elog_a("elog", "(%s) has assert failed at %s:%ld.\n", ex, func, line);
     cm_backtrace_assert(cmb_get_sp());
-    elog_flash_flush();
     while(1);
 }
 
@@ -156,28 +146,15 @@ static rt_err_t exception_hook(void *context) {
 #endif
 
     elog_output_lock_enabled(false);
-    elog_flash_lock_enabled(false);
 
 #ifdef RT_USING_FINSH
     list_thread();
 #endif
 
     cm_backtrace_fault(*((uint32_t *)(cmb_get_sp() + sizeof(uint32_t) * 8)), cmb_get_sp() + sizeof(uint32_t) * 9);
-    elog_flash_flush();
     while (_continue == 1);
 
     return RT_EOK;
-}
-
-/**
- * RT-Thread 的 kprintf 打印信息输出的底层接口
- *
- * @param str 打印信息
- */
-void rt_hw_console_output(const char *str) {
-    extern void output_log_to_console_or_flash(bool console, bool flash, const char *log, size_t size);
-    /* 同时输出打印信息至控制台及 flash 中 */
-    output_log_to_console_or_flash(true, true, str, rt_strlen(str));
 }
 
 int rt_application_init(void)

@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 
+#include <rtthread.h>
 #include <stdint.h>
 #include <libc/libc_errno.h>
 
