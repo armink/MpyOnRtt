@@ -7,7 +7,7 @@
 #error "incompatible MICROPY_OPT_CACHE_MAP_LOOKUP_IN_BYTECODE"
 #endif
 
-#if MICROPY_LONGINT_IMPL != 0
+#if MICROPY_LONGINT_IMPL != 2
 #error "incompatible MICROPY_LONGINT_IMPL"
 #endif
 
